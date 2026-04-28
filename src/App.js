@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { Header } from './Components/Header';
 import Body from './Components/Body';
@@ -10,17 +10,24 @@ import RestaurantMenu from "./Components/RestaurantMenu";
 import { Navigate, Outlet, RouterProvider, createBrowserRouter, useLocation } from "react-router-dom";
 import About from "./Components/About";
 import UserContext from "./utils/UserContext";
+import ThemeContext from "./utils/ThemeContext";
 import { Provider } from "react-redux";
 import { appStore } from "./utils/appStore";
 import AuthPage from "./Components/AuthPage";
 
 const Grocery = lazy(() => import("./Components/Grocery"));
 const AUTH_STORAGE_KEY = "foodingo-auth-user";
+const THEME_STORAGE_KEY = "foodingo-theme";
 
 const AppLayout = () => {
     const location = useLocation();
     const [userName, setUserName] = useState(() => localStorage.getItem(AUTH_STORAGE_KEY) || "");
+    const [theme, setTheme] = useState(() => localStorage.getItem(THEME_STORAGE_KEY) || "light");
     const isAuthenticated = Boolean(userName);
+
+    useEffect(() => {
+        localStorage.setItem(THEME_STORAGE_KEY, theme);
+    }, [theme]);
 
     const handleSetUserName = (name) => {
         const trimmedName = (name || "").trim();
@@ -30,6 +37,10 @@ const AppLayout = () => {
             return;
         }
         localStorage.removeItem(AUTH_STORAGE_KEY);
+    };
+
+    const toggleTheme = () => {
+        setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
     };
 
     if (!isAuthenticated && location.pathname !== "/auth") {
@@ -42,19 +53,21 @@ const AppLayout = () => {
 
     return (
         <Provider store={appStore}>
-            <UserContext.Provider value={{ loggedInUser: userName, setUserName: handleSetUserName }}>
-                {location.pathname === "/auth" ? (
-                    <AuthPage />
-                ) : (
-                    <div className="min-h-screen flex flex-col">
-                        <Header />
-                        <main className="flex-grow">
-                            <Outlet />
-                        </main>
-                        <Footer />
-                    </div>
-                )}
-            </UserContext.Provider>
+            <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                <UserContext.Provider value={{ loggedInUser: userName, setUserName: handleSetUserName }}>
+                    {location.pathname === "/auth" ? (
+                        <AuthPage />
+                    ) : (
+                        <div className={`min-h-screen flex flex-col transition-colors ${theme === "dark" ? "bg-slate-900" : "bg-slate-100"}`}>
+                            <Header />
+                            <main className="flex-grow">
+                                <Outlet />
+                            </main>
+                            <Footer />
+                        </div>
+                    )}
+                </UserContext.Provider>
+            </ThemeContext.Provider>
         </Provider>
     )
 }
