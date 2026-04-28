@@ -1,31 +1,34 @@
-import { useState,useEffect } from "react";
-import constants from "../utils/constants";
+const TopChain = ({ restaurants = [] }) => {
+    const topChains = restaurants
+        .map((restaurant) => restaurant?.info?.name)
+        .filter(Boolean)
+        .slice(0, 10);
 
-const TopChain = () => {
+    if (topChains.length === 0) {
+        return (
+            <div className="rounded-2xl border border-dashed border-gray-300 bg-white p-5 text-sm text-gray-500">
+                Top chain data is currently unavailable.
+            </div>
+        );
+    }
 
-    const [listOfRestaurants, setListOfRestaurants] = useState([]);
-    useEffect(() => {
-        fetchData();
-    }, []);
+    return (
+        <section className="rounded-2xl bg-white p-5 shadow-sm">
+            <h2 className="text-2xl font-extrabold text-gray-800">Top Chain Restaurants</h2>
+            <p className="mt-1 text-sm text-gray-500">Popular picks you can explore quickly</p>
 
-    const fetchData = async () => {
-        try {
-            const data = await fetch( 
-                constants.CORS_PLUGIN + 
-                encodeURIComponent(constants.BODY_URL));
-            const json = await data.json();
-            const restaurants = json.data.cards[1].card.card.header.title;
-            setListOfRestaurants(restaurants || []);
-        } catch (err) {
-            console.log("Error Fetching Foodingo data:", err);
-        }
-    };
-
-    return (listOfRestaurants.length === 0) ? (<h1><strike>Top Chain Not Available</strike></h1>) : (
-        <div className="topchain">
-                <h3>{listOfRestaurants}</h3>
-        </div>
+            <div className="mt-4 flex flex-wrap gap-3">
+                {topChains.map((chainName) => (
+                    <span
+                        className="rounded-full border border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700"
+                        key={chainName}
+                    >
+                        {chainName}
+                    </span>
+                ))}
+            </div>
+        </section>
     );
-}
+};
 
 export default TopChain;
