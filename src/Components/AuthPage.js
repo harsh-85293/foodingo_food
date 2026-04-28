@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserContext from "../utils/UserContext";
+import ThemeContext from "../utils/ThemeContext";
 
 const PROFILE = {
     name: "Harsh Ramchandani",
@@ -11,6 +12,7 @@ const PROFILE = {
 const AuthPage = () => {
     const navigate = useNavigate();
     const { setUserName } = useContext(UserContext);
+    const { theme, toggleTheme } = useContext(ThemeContext);
     const [isLoginView, setIsLoginView] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
@@ -41,11 +43,21 @@ const AuthPage = () => {
         setUserName(fullName);
         navigate("/");
     };
+    const isDark = theme === "dark";
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-950 via-violet-900 to-fuchsia-700 px-4 py-10">
-            <div className="mx-auto flex min-h-[84vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border border-white/20 bg-white/10 shadow-2xl backdrop-blur-sm md:flex-row">
-                <div className="flex flex-1 flex-col justify-between border-b border-white/20 bg-gradient-to-br from-violet-800/80 to-fuchsia-700/80 p-8 text-white md:border-b-0 md:border-r md:p-12">
+        <div className={`min-h-screen px-4 py-10 ${isDark ? "bg-gradient-to-br from-slate-950 via-violet-900 to-fuchsia-700" : "bg-gradient-to-br from-red-100 via-amber-50 to-orange-100"}`}>
+            <div className="mx-auto mb-4 flex w-full max-w-6xl justify-end">
+                <button
+                    className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${isDark ? "bg-white/15 text-white hover:bg-white/25" : "bg-white text-slate-700 shadow-sm hover:bg-slate-100"}`}
+                    onClick={toggleTheme}
+                    type="button"
+                >
+                    {isDark ? "Light Theme" : "Dark Theme"}
+                </button>
+            </div>
+            <div className={`mx-auto flex min-h-[84vh] w-full max-w-6xl flex-col overflow-hidden rounded-3xl border shadow-2xl backdrop-blur-sm md:flex-row ${isDark ? "border-white/20 bg-white/10" : "border-red-100 bg-white"}`}>
+                <div className={`flex flex-1 flex-col justify-between border-b p-8 md:border-b-0 md:border-r md:p-12 ${isDark ? "border-white/20 bg-gradient-to-br from-violet-800/80 to-fuchsia-700/80 text-white" : "border-red-100 bg-gradient-to-br from-red-500 to-orange-500 text-white"}`}>
                     <div>
                     <p className="mb-4 inline-block w-fit rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
                         Foodingo
@@ -101,9 +113,9 @@ const AuthPage = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-1 items-center justify-center bg-white p-6 md:p-10">
+                <div className={`flex flex-1 items-center justify-center p-6 md:p-10 ${isDark ? "bg-slate-50" : "bg-white"}`}>
                     <div className="w-full max-w-md">
-                        <div className="rounded-xl bg-gray-100 p-1">
+                        <div className={`rounded-xl p-1 ${isDark ? "bg-slate-200" : "bg-gray-100"}`}>
                             <div className="grid grid-cols-2 gap-1">
                                 <button
                                     type="button"
