@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import constants from "../utils/constants";
 import useOnlineStatus from "../utils/useOnlineStatus";
 import UserContext from "../utils/UserContext";
+import mockRestaurants from "../utils/mockdata";
 
 const Body = () => {
 
@@ -20,18 +21,25 @@ const Body = () => {
         fetchData();
     }, []);
 
+    const extractRestaurants = (json) => {
+        const cards = json?.data?.cards || [];
+        const restaurantCard = cards.find(
+            (card) => card?.card?.card?.gridElements?.infoWithStyle?.restaurants
+        );
+        return restaurantCard?.card?.card?.gridElements?.infoWithStyle?.restaurants || [];
+    };
+
     const fetchData = async () => {
         try {
-            const data = await fetch(
-                constants.CORS_PLUGIN +
-                encodeURIComponent(constants.BODY_URL)
-            );
+            const data = await fetch(constants.BODY_URL);
             const json = await data.json();
-            const restaurants = json?.data?.cards[4]?.card?.card?.gridElements?.infoWithStyle?.restaurants || [];
+            const restaurants = extractRestaurants(json);
             setListOfRestaurants(restaurants || []);
             setFilteredRestaurants(restaurants || []);
         } catch (err) {
             console.log("Error Fetching Foodingo data:", err);
+            setListOfRestaurants(mockRestaurants);
+            setFilteredRestaurants(mockRestaurants);
         }
     };
 
