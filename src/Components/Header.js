@@ -46,7 +46,7 @@ export const Header = () => {
                         Logout
                     </button>
                     <li className='m-4 px-4 py-2 flex items-center rounded-lg bg-red-400 cursor-pointer font-bold'>
-                        Hello {loggedInUser}!
+                        Welcome, {loggedInUser}!
                     </li>
                 </ul>
             </div>

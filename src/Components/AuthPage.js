@@ -26,13 +26,12 @@ const AuthPage = () => {
         const email = formData.email.trim();
         const password = formData.password.trim();
 
-        if (!email || !password || (!isLoginView && !fullName)) {
+        if (!fullName || !email || !password) {
             alert("Please fill all required fields.");
             return;
         }
 
-        const derivedName = isLoginView ? email.split("@")[0] : fullName;
-        setUserName(derivedName || "Guest");
+        setUserName(fullName);
         navigate("/");
     };
 
@@ -43,20 +42,18 @@ const AuthPage = () => {
                     {isLoginView ? "Login to Foodingo" : "Create Foodingo Account"}
                 </h1>
                 <p className="mt-2 text-sm text-gray-500">
-                    {isLoginView ? "Welcome back! Enter your details." : "Sign up to continue browsing restaurants."}
+                    {isLoginView ? "Welcome back! Enter your details and name." : "Sign up with your name to continue browsing restaurants."}
                 </p>
 
                 <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-                    {!isLoginView && (
-                        <input
-                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-400 focus:outline-none"
-                            name="fullName"
-                            type="text"
-                            placeholder="Full name"
-                            value={formData.fullName}
-                            onChange={handleInputChange}
-                        />
-                    )}
+                    <input
+                        className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-400 focus:outline-none"
+                        name="fullName"
+                        type="text"
+                        placeholder="Full name"
+                        value={formData.fullName}
+                        onChange={handleInputChange}
+                    />
                     <input
                         className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-red-400 focus:outline-none"
                         name="email"
