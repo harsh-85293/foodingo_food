@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useContext } from 'react';
 import constants from '../utils/constants'
 import { Link } from 'react-router-dom';
 import useOnlineStatus from '../utils/useOnlineStatus';
@@ -7,9 +7,8 @@ import { useSelector } from 'react-redux';
 
 export const Header = () => {
 
-    const [btnNameReact, setBtnNameReact] = useState("Login");
     const onlineStatus = useOnlineStatus(true);
-    const { loggedInUser } = useContext(UserContext);
+    const { loggedInUser, setUserName } = useContext(UserContext);
     const cartItems = useSelector((store) => store.cart.items);
     
     return (
@@ -40,12 +39,11 @@ export const Header = () => {
                     <li className='m-4 px-4 py-2 flex items-center rounded-lg hover:font-bold hover:sm:bg-amber-300 hover:lg:bg-red-300 cursor-pointer'>
                         <Link to="/grocery">Grocery</Link>
                     </li>
-                    <button className="login m-4 px-4 py-2 flex items-center rounded-lg bg-red-200 cursor-pointer hover:font-bold hover:lg:bg-red-300" onClick={() => {
-                        btnNameReact === "Login" ?
-                            setBtnNameReact("Logout") :
-                            setBtnNameReact("Login");
-                    }}
-                    >{btnNameReact}
+                    <button
+                        className="login m-4 px-4 py-2 flex items-center rounded-lg bg-red-200 cursor-pointer hover:font-bold hover:lg:bg-red-300"
+                        onClick={() => setUserName("")}
+                    >
+                        Logout
                     </button>
                     <li className='m-4 px-4 py-2 flex items-center rounded-lg bg-red-400 cursor-pointer font-bold'>
                         Hello {loggedInUser}!

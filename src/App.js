@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useState } from "react";
 import ReactDOM from "react-dom/client";
 import { Header } from './Components/Header';
 import Body from './Components/Body';
@@ -7,35 +7,53 @@ import Contact from "./Components/Contact";
 import Error from "./Components/Error";
 import Cart from "./Components/Cart";
 import RestaurantMenu from "./Components/RestaurantMenu";
-import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
+import { Navigate, Outlet, RouterProvider, createBrowserRouter, useLocation } from "react-router-dom";
 import About from "./Components/About";
-import { useState } from "react";
 import UserContext from "./utils/UserContext";
 import { Provider } from "react-redux";
 import { appStore } from "./utils/appStore";
+import AuthPage from "./Components/AuthPage";
 
 const Grocery = lazy(() => import("./Components/Grocery"));
+const AUTH_STORAGE_KEY = "foodingo-auth-user";
 
 const AppLayout = () => {
+    const location = useLocation();
+    const [userName, setUserName] = useState(() => localStorage.getItem(AUTH_STORAGE_KEY) || "");
+    const isAuthenticated = Boolean(userName);
 
-    const [userName, setUserName] = useState();
-    useEffect(() => {
-        const data = {
-            name: "Rohit Ramchandani"
-        };
-        setUserName(data.name);
-    }, []);
+    const handleSetUserName = (name) => {
+        const trimmedName = (name || "").trim();
+        setUserName(trimmedName);
+        if (trimmedName) {
+            localStorage.setItem(AUTH_STORAGE_KEY, trimmedName);
+            return;
+        }
+        localStorage.removeItem(AUTH_STORAGE_KEY);
+    };
+
+    if (!isAuthenticated && location.pathname !== "/auth") {
+        return <Navigate to="/auth" replace />;
+    }
+
+    if (isAuthenticated && location.pathname === "/auth") {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <Provider store={appStore}>
-            <UserContext.Provider value={{ loggedInUser: userName, setUserName }}>
-                <div className="min-h-screen flex flex-col">
-                    <Header />
-                    <main className="flex-grow">
-                        <Outlet />
-                    </main>
-                    <Footer />
-                </div>
+            <UserContext.Provider value={{ loggedInUser: userName, setUserName: handleSetUserName }}>
+                {location.pathname === "/auth" ? (
+                    <AuthPage />
+                ) : (
+                    <div className="min-h-screen flex flex-col">
+                        <Header />
+                        <main className="flex-grow">
+                            <Outlet />
+                        </main>
+                        <Footer />
+                    </div>
+                )}
             </UserContext.Provider>
         </Provider>
     )
@@ -72,6 +90,10 @@ const appRouter = createBrowserRouter([
             {
                 path: "/cart",
                 element: <Cart />,
+            },
+            {
+                path: "/auth",
+                element: <div />,
             }
         ],
         errorElement: <Error />,
